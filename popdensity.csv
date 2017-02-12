@@ -1,0 +1,15 @@
+Province,Population,area sq miles,PopDensity,Electricity,Gas,Total households,PercElectricity,long,lat,id,Display
+Chagang-do,1299830,6551,198.42,4469,359,327412,1.36,126.56,40.72,0,Jagang
+Hamgyong-bukto,2327362,6784,343.07,3302,584,587844,0.56,129.46,41.81,1,North Hamgyong
+Hamgyong-namdo,3066013,7324,418.63,4467,702,777207,0.57,128.29,40.31,2,South Hamgyong
+Hwanghae-bukto,2113672,3091,683.81,1264,660,535511,0.24,126.44,38.38,3,North Hwanghae
+Hwanghae-namdo,2310485,3090,747.73,891,619,578280,0.15,125.48,38.20,4,South Hwanghae
+Kaesong,,,,,,,,0.00,0.00,5,Kaesong
+Kangwon-do,1477582,4306,343.14,2116,436,367938,0.58,127.56,38.84,6,Kangwon
+Kumgangsan,,,,,,,,0.00,0.00,7,Kumgangsan
+P'yongan-bukto,2728662,4707,579.7,2256,891,688583,0.33,125.39,39.93,8,North Phyongan
+P'yongan-namdo,4051696,4470,906.42,3763,2223,1027727,0.37,126.17,39.35,9,South Phyongan
+P'yongyang,3255288,772,4216.69,52470,160873,813769,6.45,125.80,38.97,10,Pyongyang
+Rason,,,,,,,,0.00,0.00,11,Rason
+Ryanggang,719269,5528,130.11,4059,115,183200,2.22,128.51,41.23,12,Ryanggang
+Sinuiju,,,,,,,,0.00,0.00,13,Sinuiju
