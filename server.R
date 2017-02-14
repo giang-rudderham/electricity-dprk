@@ -2,26 +2,15 @@ library(shiny)
 library(rgdal) # for readOGR
 library(leaflet)
 
-# Create data frame for circles
-sanitation <- read.csv("data/sanitationCleaned.csv", stringsAsFactors = FALSE)
+#read shape file
+dprk.shp <- readOGR(dsn = "PRK_adm", layer = "PRK_adm1") #SpatialPolygonsDF
 
-# Create SpatialPolygonsDataFrame
-data <- read.csv("data/underNourishedCleaned.csv", stringsAsFactors = F)
+#read data
+data <- read.csv("popdensity.csv")
 
-## fix countries in failed matches
-# library(ggmap) # for function geocode
-# data$Country[grep("Palestine", data$Country)] <- "Palestine"
-# ## to accommodate geocode
-# 
-# for (fix in c("Gibraltar", "Guadeloupe", "Libyan Arab Jamahiriya",
-#               "Martinique", "Mayotte", "Reunion", "Tokelau",
-#               "Palestine")) {
-#   data$Country[which(data$Country == fix)] <-
-#     geocode(fix, output = "more")$country
-# }
 
-joined.to.map <- joinCountryData2Map(data, joinCode = "NAME", 
-                                     nameJoinColumn = "Country")
+dprk.shp$Province <- dprk.shp$NAME_1
+dprk.shp@data <- merge(dprk.shp@data, data, by = "Province")
 
 
 shinyServer(function(input, output, session) {
