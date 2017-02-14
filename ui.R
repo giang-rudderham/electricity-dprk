@@ -30,8 +30,8 @@ shinyUI(navbarPage("Energy usage in DPRK, 2008", id = "nav",
                                                                         "Please send questions and comments
                                                                          to Giang Rudderham (giang.rudderham@gmail.com)")
                                          )
-                                         )
                                 )
+                            )
                    # ,
                    # 
                    # tabPanel("Histogram",
