@@ -32,22 +32,44 @@ shinyServer(function(input, output) {
                 values = dprk.shp$PopDensity, opacity = 0.5,
                 title = "Population Density") %>%
       addMarkers(lng = 125.8, lat = 38.97, 
-                 popup = "The Capital: Pyongyang <br> Population Density: 4216.69")
+                 popup = paste("The Capital: Pyongyang <br> Population Density:",
+                          dprk.shp$PopDensity[dprk.shp$Display == "Pyongyang"], "<br>",
+                          "Households that use electricity as cooking fuel:",
+                          dprk.shp$PercElectricityCooking[dprk.shp$Display == "Pyongyang"], "%",
+                          "<br>", "Households that use electronic heating:",
+                          dprk.shp$PercElectronicHeating[dprk.shp$Display == "Pyongyang"], "%")
+                 )
   })  
   
   # put dynamic parts of the map in observers
-  ## add circles
+  ## add circles for cooking fuel
   observe({
     proxy <- leafletProxy("dprkmap", data = dprk.shp)
-    proxy %>% clearGroup(group = "electricity")
+    proxy %>% clearGroup(group = "electricitycooking")
     if (input$cooking) {
       proxy %>%
         addCircles(data = dprk.shp, lng = ~long, lat = ~lat, weight = 1, opacity = 3,
-                   radius = sqrt(dprk.shp$PercElectricity / pi) * 30000, 
+                   radius = sqrt(dprk.shp$PercElectricityCooking / pi) * 30000, 
                    popup = paste("Province:", dprk.shp$Display, "<br>",
                                  "Households that use electricity as cooking fuel:",
-                                 dprk.shp$PercElectricity, "%"),
-                   group = "electricity")
+                                 dprk.shp$PercElectricityCooking, "%"),
+                   group = "electricitycooking")
+    }
+  })
+  
+  ## add cricles for heating system
+  observe({
+    proxy <- leafletProxy("dprkmap", data = dprk.shp)
+    proxy %>% clearGroup(group = "electronicheating")
+    if (input$heating) {
+      proxy %>%
+        addCircles(data = dprk.shp, lng = ~long, lat = ~lat, weight = 1, opacity = 3,
+                   radius = sqrt(dprk.shp$PercElectronicHeating / pi) * 30000,
+                   fillColor = "green", color = "green",
+                   popup = paste("Province:", dprk.shp$Display, "<br>",
+                                 "Households that use electronic heating:",
+                                 dprk.shp$PercElectronicHeating, "%"),
+                   group = "electronicheating")
     }
   })
 })
