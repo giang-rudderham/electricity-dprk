@@ -40,4 +40,11 @@ m <- leaflet() %>%
                            dprk.shp$PercElectricityCooking, "%"),
              group = "electricitycooking")
 
-m
+m %>%
+  addCircles(data = dprk.shp, lng = ~long, lat = ~lat, weight = 1, opacity = 3,
+             radius = sqrt(dprk.shp$PercElectronicHeating / pi) * 30000,
+             fillColor = "green", color = "green",
+             popup = paste("Province:", dprk.shp$Display, "<br>",
+                           "Households that use electronic heating:",
+                           dprk.shp$PercElectronicHeating, "%"),
+             group = "electronicheating")
