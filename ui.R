@@ -22,6 +22,9 @@ shinyUI(navbarPage("Energy usage in DPRK, 2008", id = "nav",
                                               #             animate = FALSE, sep = ""),
                                               checkboxInput("cooking", 
                                                             "Percentage of households that use electricity as cooking fuel",
+                                                            value = FALSE),
+                                              checkboxInput("heating",
+                                                            "Percentage of households that use electronic heating",
                                                             value = TRUE)
                                 ),
                                 
