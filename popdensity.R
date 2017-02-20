@@ -1,3 +1,8 @@
+library(rgdal) # for readOGR function
+library(leaflet)
+library(ggplot2) # for barplot
+library(stringr) # for str_wrap function
+
 # Use leaflet to create map
 ######################
 #read shapefile
@@ -65,5 +70,6 @@ b <- ggplot(data = df, aes(x = type, y = households)) +
   geom_text(aes(label = households), vjust = -0.3, size = 3.5) +
   labs(title = paste("Households by Type of Heating System in", input), 
        x = "Type of Heating System", y = "Number of Households") +
-  theme_minimal()
+  theme_minimal() +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 10))
 b
