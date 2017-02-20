@@ -15,7 +15,7 @@ shinyUI(navbarPage("Energy usage in DPRK, 2008", id = "nav",
                                 absolutePanel(id = "controls", class = "panel panel-default",
                                               fixed = TRUE, draggable = TRUE, top = "auto",
                                               left = 20, right = "auto", bottom = 60,
-                                              width = 330, height = "auto",
+                                              width = 530, height = "auto",
                                               
                                               # sliderInput("yearmap", "Choose a year:",
                                               #             min = 1991, max = 2015, value = 2015,
@@ -27,7 +27,7 @@ shinyUI(navbarPage("Energy usage in DPRK, 2008", id = "nav",
                                                             "Percentage of households that use electronic heating",
                                                             value = TRUE),
                                               
-                                              plotOutput("barCooking", height = 200)
+                                              plotOutput("barCooking", height = 500)
                                 ),
                                 
                                 tags$div(id = "cite",
