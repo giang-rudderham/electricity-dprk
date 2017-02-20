@@ -59,8 +59,8 @@ shinyServer(function(input, output) {
                    popup = paste("Province:", dprk.shp$Display, "<br>",
                                  "Households that use electricity as cooking fuel:",
                                  dprk.shp$PercElectricityCooking, "%"),
-                   group = "electricitycooking",
-                   layerId = ~Display)
+                   group = "electricitycooking"
+                  )
     }
   })
   
@@ -76,8 +76,8 @@ shinyServer(function(input, output) {
                    popup = paste("Province:", dprk.shp$Display, "<br>",
                                  "Households that use electronic heating:",
                                  dprk.shp$PercElectronicHeating, "%"),
-                   group = "electronicheating", 
-                   layerId = ~Display)
+                   group = "electronicheating" 
+                   )
     }
   })
   
