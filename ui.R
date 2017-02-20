@@ -25,7 +25,9 @@ shinyUI(navbarPage("Energy usage in DPRK, 2008", id = "nav",
                                                             value = FALSE),
                                               checkboxInput("heating",
                                                             "Percentage of households that use electronic heating",
-                                                            value = TRUE)
+                                                            value = TRUE),
+                                              
+                                              plotOutput("barCooking", height = 200)
                                 ),
                                 
                                 tags$div(id = "cite",
