@@ -67,9 +67,10 @@ df <- data.frame(type = c("Central/Local", "Electronic", "Electronic with others
 
 b <- ggplot(data = df, aes(x = type, y = households)) +
   geom_bar(stat = "identity", fill = "steelblue") +
-  geom_text(aes(label = households), vjust = -0.3, size = 3.5) +
+  geom_text(aes(label = households), vjust = -0.3, size = 3.5) + #display y values on bars
   labs(title = paste("Households by Type of Heating System in", input), 
        x = "Type of Heating System", y = "Number of Households") +
   theme_minimal() +
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 10))
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) + #wrap x var names
+  ylim(0, max(heating[ , 3:8]))
 b
