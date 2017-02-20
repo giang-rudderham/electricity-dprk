@@ -1,15 +1,17 @@
 library(shiny)
 library(rgdal) # for readOGR
 library(leaflet)
+library(ggplot2) # for barplot
 
-# Version 3: update map with clicking on the provinces #################
-################################################
+# Version 3: add bar plot
+##############################
 
 #read shapefile
 dprk.shp <- readOGR(dsn = "PRK_adm", layer = "PRK_adm1") #SpatialPolygonsDF
 
 #read data
 data <- read.csv("popdensity.csv")
+heating <- read.csv(file = "heating.csv") # heating data
 
 #Merge shapefile with DPRK data
 dprk.shp$Province <- dprk.shp$NAME_1 #create "Province" to merge by "Province";
@@ -62,7 +64,7 @@ shinyServer(function(input, output) {
     }
   })
   
-  ## add cricles for heating system
+  ## add circles for heating system
   observe({
     proxy <- leafletProxy("dprkmap", data = dprk.shp)
     proxy %>% clearGroup(group = "electronicheating")
@@ -79,17 +81,24 @@ shinyServer(function(input, output) {
     }
   })
   
-  ## clicking on marker at Pyongyang generates a marker at South Hamgyong
-  observeEvent(input$dprkmap_shape_click, {
-    proxy <- leafletProxy("dprkmap", data = dprk.shp)
+  ## clicking on any province generates a marker at South Hamgyong
+
+  df_reactive <- eventReactive(input$dprkmap_shape_click, {
     p <- input$dprkmap_shape_click
-    proxy %>% 
-      clearGroup(group = "testpopup") %>%
-      addMarkers(lng = 128.30, lat = 40.37, popup = paste(p$lng, p$lat, p$id), group = "testpopup")
-    
+    data.frame(type = c("Central/Local", "Electronic", "Electronic with others",
+                        "Coal boiler/Briquette hole", "Wood hole", "Others"),
+               households = as.numeric(heating[heating$Province == p$id, 3:8])
+    )
   })
+
   
-  #output$histCooking <- renderPlot({
-   # plot(rnorm(23), rnorm(23))
-  #})
+  
+  output$barCooking <- renderPlot({
+    ggplot(data = df_reactive(), aes(x = type, y = households)) +
+      geom_bar(stat = "identity", fill = "steelblue") +
+      geom_text(aes(label = households), vjust = -0.3, size = 3.5) +
+      labs(title = paste("Households by Type of Heating System in", "p$id"), 
+           x = "Type of Heating System", y = "Number of Households") +
+      theme_minimal()
+  })
 })
