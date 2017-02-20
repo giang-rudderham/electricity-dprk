@@ -1,7 +1,8 @@
 library(shiny)
-library(rgdal) # for readOGR
+library(rgdal) # for readOGR function
 library(leaflet)
 library(ggplot2) # for barplot
+library(stringr) # for str_wrap function
 
 # Version 3: add bar plot
 ##############################
@@ -59,8 +60,8 @@ shinyServer(function(input, output) {
                    popup = paste("Province:", dprk.shp$Display, "<br>",
                                  "Households that use electricity as cooking fuel:",
                                  dprk.shp$PercElectricityCooking, "%"),
-                   group = "electricitycooking"
-                  )
+                   group = "electricitycooking"#, layerId = ~Display
+                   )
     }
   })
   
@@ -76,29 +77,32 @@ shinyServer(function(input, output) {
                    popup = paste("Province:", dprk.shp$Display, "<br>",
                                  "Households that use electronic heating:",
                                  dprk.shp$PercElectronicHeating, "%"),
-                   group = "electronicheating" 
+                   group = "electronicheating"#, layerId = ~Display
                    )
     }
   })
   
-  ## clicking on any province generates a marker at South Hamgyong
+  ## clicking on any province generates bar plot of heating energy for that province
 
   df_reactive <- eventReactive(input$dprkmap_shape_click, {
     p <- input$dprkmap_shape_click
     data.frame(type = c("Central/Local", "Electronic", "Electronic with others",
                         "Coal boiler/Briquette hole", "Wood hole", "Others"),
-               households = as.numeric(heating[heating$Province == p$id, 3:8])
+               households = as.numeric(heating[heating$Province == p$id, 3:8]),
+               province_name = p$id #this extra column stores province for title of plot later
     )
   })
 
-  
-  
+
   output$barCooking <- renderPlot({
     ggplot(data = df_reactive(), aes(x = type, y = households)) +
       geom_bar(stat = "identity", fill = "steelblue") +
-      geom_text(aes(label = households), vjust = -0.3, size = 3.5) +
-      labs(title = paste("Households by Type of Heating System in", "p$id"), 
+      geom_text(aes(label = households), vjust = -0.3, size = 3.5) + #display y values on bars
+      labs(title = paste("Households by Type of Heating System in", df_reactive()[1, 3]),
+            #get province name from third column of data frame from df_reactive() earlier
            x = "Type of Heating System", y = "Number of Households") +
-      theme_minimal()
+      theme_minimal() +
+      scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) + #wrap x var names 
+      ylim(0, max(heating[ , 3:8])) #set same y axis for bar plots of all provinces
   })
 })
