@@ -27,7 +27,9 @@ shinyUI(navbarPage("Energy usage in DPRK, 2008", id = "nav",
                                                             "Percentage of households that use electronic heating",
                                                             value = TRUE),
                                               
-                                              plotOutput("barCooking", height = 500)
+                                              plotOutput("barCooking", height = 275),
+                                              
+                                              plotOutput("barHeating", height = 275)
                                 ),
                                 
                                 tags$div(id = "cite",
