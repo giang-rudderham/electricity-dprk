@@ -12,7 +12,8 @@ dprk.shp <- readOGR(dsn = "PRK_adm", layer = "PRK_adm1") #SpatialPolygonsDF
 
 #read data
 data <- read.csv("popdensity.csv")
-heating <- read.csv(file = "heating.csv") # heating data
+heating <- read.csv(file = "heating.csv") # heating system data
+cooking <- read.csv(file = "cooking.csv") # cooking fuel data
 
 #Merge shapefile with DPRK data
 dprk.shp$Province <- dprk.shp$NAME_1 #create "Province" to merge by "Province";
@@ -86,23 +87,39 @@ shinyServer(function(input, output) {
 
   df_reactive <- eventReactive(input$dprkmap_shape_click, {
     p <- input$dprkmap_shape_click
-    data.frame(type = c("Central/Local", "Electronic", "Electronic with others",
+    data.frame(type_heating = c("Central/Local", "Electronic", "Electronic with others",
                         "Coal boiler/Briquette hole", "Wood hole", "Others"),
-               households = as.numeric(heating[heating$Province == p$id, 3:8]),
+               households_heating = as.numeric(heating[heating$Province == p$id, 3:8]),
+               type_cooking = c("Electricity", "Gas", "Petroleum", "Coal", "Wood", "Others"),
+               households_cooking = as.numeric(cooking[cooking$Province == p$id, 3:8]),
                province_name = p$id #this extra column stores province for title of plot later
     )
   })
 
 
   output$barCooking <- renderPlot({
-    ggplot(data = df_reactive(), aes(x = type, y = households)) +
+    ggplot(data = df_reactive(), aes(x = type_cooking, y = households_cooking)) +
       geom_bar(stat = "identity", fill = "steelblue") +
-      geom_text(aes(label = households), vjust = -0.3, size = 3.5) + #display y values on bars
-      labs(title = paste("Households by Type of Heating System in", df_reactive()[1, 3]),
-            #get province name from third column of data frame from df_reactive() earlier
+      geom_text(aes(label = households_cooking), vjust = -0.3, size = 3.5) + #display y values on bars
+      labs(title = paste("Households by Type of Cooking Fuel in", df_reactive()[1, 5]),
+           #get province name from fifth column of data frame from df_reactive() earlier
+           x = "Type of Cooking Fuel Used", y = "Number of Households") +
+      theme_minimal() +
+      scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) + #wrap x var names 
+      ylim(0, max(cooking[ , 3:8])) #set same y axis for bar plots of all provinces
+  })
+  
+  output$barHeating <- renderPlot({
+    ggplot(data = df_reactive(), aes(x = type_heating, y = households_heating)) +
+      geom_bar(stat = "identity", fill = "green") +
+      geom_text(aes(label = households_heating), vjust = -0.3, size = 3.5) + #display y values on bars
+      labs(title = paste("Households by Type of Heating System in", df_reactive()[1, 5]),
+            #get province name from fifth column of data frame from df_reactive() earlier
            x = "Type of Heating System", y = "Number of Households") +
       theme_minimal() +
       scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) + #wrap x var names 
       ylim(0, max(heating[ , 3:8])) #set same y axis for bar plots of all provinces
   })
+  
+  
 })
