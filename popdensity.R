@@ -56,8 +56,8 @@ m %>%
 
 m %>% addTiles()
 
-# Generate bar plot
-#####################
+# Generate bar plot for heating
+##############################
 heating <- read.csv(file = "heating.csv")
 input <- "Pyongyang"
 df <- data.frame(type = c("Central/Local", "Electronic", "Electronic with others",
@@ -74,3 +74,11 @@ b <- ggplot(data = df, aes(x = type, y = households)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) + #wrap x var names
   ylim(0, max(heating[ , 3:8]))
 b
+
+# Generate bar plot for cooking fuel
+################################
+cooking <- read.csv(file = "cooking.csv")
+inputC <- "Pyongyang"
+dfC <- data.frame(typeC = c("Electricity", "Gas", "Petroleum", "Coal", "Wood", "Others"),
+                 householdsC = as.numeric(cooking[cooking$Province == inputC, 3:8])
+                 )
