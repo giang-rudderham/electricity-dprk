@@ -4,9 +4,8 @@ library(leaflet)
 library(ggplot2) # for barplot
 library(stringr) # for str_wrap function
 
-# Version 3: add bar plot
+#Version 4: make circles clickable to display bar plots
 ##############################
-
 #read shapefile
 dprk.shp <- readOGR(dsn = "PRK_adm", layer = "PRK_adm1") #SpatialPolygonsDF
 
@@ -32,7 +31,7 @@ shinyServer(function(input, output) {
       addPolygons(data = dprk.shp, stroke = TRUE, color = "black", weight = 1,
                   smoothFactor = 1,
                   fillOpacity = 0.5, fillColor = binpal(dprk.shp$PopDensity),
-                  popup = paste("Province:", dprk.shp$Display, "<br>",
+                  popup = paste("Province/Region:", dprk.shp$Display, "<br>",
                                 "Population Density:", dprk.shp$PopDensity),
                   group = "density",
                   layerId = ~Display) %>%
@@ -61,8 +60,10 @@ shinyServer(function(input, output) {
                    popup = paste("Province:", dprk.shp$Display, "<br>",
                                  "Households that use electricity as cooking fuel:",
                                  dprk.shp$PercElectricityCooking, "%"),
-                   group = "electricitycooking"#, layerId = ~Display
-                   )
+                   group = "electricitycooking", layerId = ~paste0(Display, "1")
+                   # here have to assign layerId different from the polygons earlier;
+                   # and circles for heating later;
+        )
     }
   })
   
@@ -78,21 +79,36 @@ shinyServer(function(input, output) {
                    popup = paste("Province:", dprk.shp$Display, "<br>",
                                  "Households that use electronic heating:",
                                  dprk.shp$PercElectronicHeating, "%"),
-                   group = "electronicheating"#, layerId = ~Display
-                   )
+                   group = "electronicheating", layerId = ~paste0(Display, "2")
+                   # here have to assign layerId different from the polygons;
+                   # and circles for cooking earlier;
+        )
     }
   })
   
-  ## clicking on any province generates bar plot of heating energy for that province
-
+  ## clicking on a province generates bar plots of heating and cooking fuel for that province
+  ### Get data frame for the province that was clicked on
   df_reactive <- eventReactive(input$dprkmap_shape_click, {
     p <- input$dprkmap_shape_click
+    
+    #### if p$id ends in "1" or "2", get rid of these numbers;
+    #### p$id that end in "1" or "2" come from circles; 
+    #### p$id that do not end in "1" or "2" come from the polygons;
+    #### The goal is to extract from p$id the name of the province that is being clicked on;
+    if (regmatches(p$id, regexpr(".$", p$id)) == "1" | 
+          # this regmatches function returns the last character in the string given by p$id;
+        regmatches(p$id, regexpr(".$", p$id)) == "2") {
+      id <- sub("[0-9]", "", p$id)
+    }
+    else id <- p$id
+          
+    
     data.frame(type_heating = c("Central/Local", "Electronic", "Electronic with others",
-                        "Coal boiler/Briquette hole", "Wood hole", "Others"),
-               households_heating = as.numeric(heating[heating$Province == p$id, 3:8]),
+                                "Coal boiler/Briquette hole", "Wood hole", "Others"),
+               households_heating = as.numeric(heating[heating$Province == id, 3:8]),
                type_cooking = c("Electricity", "Gas", "Petroleum", "Coal", "Wood", "Others"),
-               households_cooking = as.numeric(cooking[cooking$Province == p$id, 3:8]),
-               province_name = p$id #this extra column stores province for title of plot later
+               households_cooking = as.numeric(cooking[cooking$Province == id, 3:8]),
+               province_name = id #this extra column stores province for title of plot later;
     )
   })
 
@@ -105,21 +121,20 @@ shinyServer(function(input, output) {
            #get province name from fifth column of data frame from df_reactive() earlier
            x = "Type of Cooking Fuel Used", y = "Number of Households") +
       theme_minimal() +
-      scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) + #wrap x var names 
+      scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) + #wrap x var names
       ylim(0, max(cooking[ , 3:8])) #set same y axis for bar plots of all provinces
   })
-  
+
   output$barHeating <- renderPlot({
     ggplot(data = df_reactive(), aes(x = type_heating, y = households_heating)) +
       geom_bar(stat = "identity", fill = "green") +
       geom_text(aes(label = households_heating), vjust = -0.3, size = 3.5) + #display y values on bars
       labs(title = paste("Households by Type of Heating System in", df_reactive()[1, 5]),
-            #get province name from fifth column of data frame from df_reactive() earlier
+           #get province name from fifth column of data frame from df_reactive() earlier
            x = "Type of Heating System", y = "Number of Households") +
       theme_minimal() +
-      scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) + #wrap x var names 
+      scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) + #wrap x var names
       ylim(0, max(heating[ , 3:8])) #set same y axis for bar plots of all provinces
   })
-  
   
 })
