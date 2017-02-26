@@ -27,7 +27,7 @@ shinyServer(function(input, output) {
   #static part of the map
   output$dprkmap <- renderLeaflet({
     leaflet () %>%
-      setView(lng = 128, lat = 40, zoom = 7) %>%
+      setView(lng = 124, lat = 42, zoom = 7) %>%
       addPolygons(data = dprk.shp, stroke = TRUE, color = "black", weight = 1,
                   smoothFactor = 1,
                   fillOpacity = 0.5, fillColor = binpal(dprk.shp$PopDensity),
